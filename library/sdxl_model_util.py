@@ -256,11 +256,13 @@ def load_models_from_sdxl_checkpoint(model_version, ckpt_path, map_location, dty
             te1_sd[k.replace("conditioner.embedders.0.transformer.", "")] = state_dict.pop(k)
         elif k.startswith("conditioner.embedders.1.model."):
             te2_sd[k] = state_dict.pop(k)
-
+    te1_sd.pop('text_model.embeddings.position_ids',None)
     info1 = text_model1.load_state_dict(te1_sd)
     print("text encoder 1:", info1)
 
     converted_sd, logit_scale = convert_sdxl_text_encoder_2_checkpoint(te2_sd, max_length=77)
+    converted_sd.pop('text_model.embeddings.position_ids',None)
+    
     info2 = text_model2.load_state_dict(converted_sd)
     print("text encoder 2:", info2)
 
